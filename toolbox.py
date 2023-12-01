@@ -1,6 +1,5 @@
 # Yuwen Chang
 # 2020-08-16
-# https://github.com/ywnch/toolbox
 
 import numpy as np
 import pandas as pd
