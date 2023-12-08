@@ -84,7 +84,7 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
         line = snap(line, pps, 1e-8)  # slow?
 
         try:
-            new_lines = list(split(line, pps))  # split into segments
+            new_lines = list(split(line, pps).geoms)  # split into segments
             return new_lines
         except TypeError as e:
             print('Error when splitting line: {}\n{}\n{}\n'.format(e, line, pps))
@@ -114,6 +114,8 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
             print("Unknown ptype when updating nodes.")
 
         # merge new nodes (it is safe to ignore the index for nodes)
+        nodes = nodes.to_crs(meter_epsg)
+        new_nodes = new_nodes.to_crs(meter_epsg)
         gdfs = [nodes, new_nodes]
         nodes = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True, sort=False),
                                  crs=gdfs[0].crs)
@@ -178,6 +180,8 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
             new_edges = new_edges.iloc[valid_pos]  # use 'iloc' here
 
         # merge new edges
+        edges.crs = meter_epsg
+        new_edges.crs = meter_epsg
         dfs = [edges, new_edges]
         edges = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=False, sort=False), crs=dfs[0].crs)
 
