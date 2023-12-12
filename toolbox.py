@@ -14,7 +14,7 @@ from shapely.ops import snap, split
 pd.options.mode.chained_assignment = None
 
 
-def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=5, meter_epsg=3857):
+def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=5, meter_epsg=3857, counter=0):
     """Connect and integrate a set of POIs into an existing road network.
 
     Given a road network in the form of two GeoDataFrames: nodes and edges,
@@ -122,7 +122,7 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
 
         return nodes, new_nodes  # all nodes, newly added nodes only
 
-    def update_edges(edges, new_lines, replace):
+    def update_edges(edges, new_lines, nodes, replace):
         """
         Update edge info by adding new_lines; or,
         replace existing ones with new_lines (n-split segments).
@@ -156,10 +156,15 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
 
         # update features (a bit slow)
         new_edges['length'] = [l.length for l in new_lines]
+        
         new_edges['from'] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[0], None))
         new_edges['to'] = new_edges['geometry'].map(
             lambda x: nodes_id_dict.get(list(x.coords)[-1], None))
+        
+        new_edges['u'] = new_edges['from']
+        new_edges['v'] = new_edges['to'] 
+        
         new_edges['osmid'] = ['_'.join(list(map(str, s))) for s in zip(new_edges['from'], new_edges['to'])]
 
         # remember to reindex to prevent duplication when concat
@@ -193,7 +198,7 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
     node_highway_pp = 'projected_pap'  # POI Access Point
     node_highway_poi = 'poi'
     edge_highway = 'projected_footway'
-    osmid_prefix = 9990000000
+    osmid_prefix = 9990100000 + 100000*counter
 
     # convert CRS
     pois_meter = pois.to_crs(epsg=meter_epsg)
@@ -204,7 +209,7 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
     print("Building rtree...")
     Rtree = rtree.index.Index()
     [Rtree.insert(fid, geom.bounds) for fid, geom in edges_meter['geometry'].iteritems()]
-
+    
     ## STAGE 1: interpolation
     # 1-1: update external nodes (pois)
     print("Updating external nodes...")
@@ -229,19 +234,19 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
     nodes_id_dict = dict(zip(nodes_coord, nodes_meter['osmid'].astype('Int64')))
 
     # 1-3: update internal edges (split line segments)
-    print("Updating internal edges...")
+    print("Updating internal edges...")   
     # split
     line_pps_dict = {k: MultiPoint(list(v)) for k, v in pois_meter.groupby(['kne_idx'])['pp']}
     new_lines = [split_line(edges_meter['geometry'][idx], pps) for idx, pps in line_pps_dict.items()]  # bit slow
-    edges_meter, _ = update_edges(edges_meter, new_lines, replace=True)
+    edges_meter, _ = update_edges(edges_meter, new_lines, nodes_meter, replace=True)
 
     ## STAGE 2: connection
     # 2-1: update external edges (projected footways connected to pois)
     # establish new_edges
-    print("Updating external links...")
+    print("Updating external links...")        
     pps_gdf = nodes_meter[nodes_meter['highway'] == node_highway_pp]
     new_lines = [LineString([p1, p2]) for p1, p2 in zip(pois_meter['geometry'], pps_gdf['geometry'])]
-    edges_meter, _ = update_edges(edges_meter, new_lines, replace=False)
+    edges_meter, _ = update_edges(edges_meter, new_lines, nodes_meter, replace=False)
 
     ## STAGE 3: output
     # convert CRS
@@ -263,9 +268,9 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
         print("Nodes count:", len(nodes_meter))
         print("Node coordinates key count:", len(nodes_id_dict))
     # - examine missing nodes
-    print("Missing 'from' nodes:", len(edges[edges['from'] == None]))
+    print("Missing 'from' nodes:", len(edges[edges['from'] == None])) #this doesn't check for nan
     print("Missing 'to' nodes:", len(edges[edges['to'] == None]))
-
+        
     # save and return
     if path:
         nodes.to_file(path+'/nodes.shp')
