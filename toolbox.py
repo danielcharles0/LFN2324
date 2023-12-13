@@ -14,7 +14,7 @@ from shapely.ops import snap, split
 pd.options.mode.chained_assignment = None
 
 
-def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=5, meter_epsg=3857, counter=0):
+def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=5, meter_epsg=3857, counter=0, cat='poi'):
     """Connect and integrate a set of POIs into an existing road network.
 
     Given a road network in the form of two GeoDataFrames: nodes and edges,
@@ -196,7 +196,7 @@ def connect_poi(pois, nodes, edges, key_col=None, path=None, threshold=200, knn=
     # 0-2: configurations
     # set poi arguments
     node_highway_pp = 'projected_pap'  # POI Access Point
-    node_highway_poi = 'poi'
+    node_highway_poi = cat
     edge_highway = 'projected_footway'
     osmid_prefix = 9990100000 + 100000*counter
 
