@@ -4,3 +4,4 @@ geopandas==0.14.0
 pandas==1.4.1
 numpy==1.26.1
 shapely==2.0.2
+networkx==3.2.1
