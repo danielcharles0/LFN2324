@@ -70,16 +70,16 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. (optional) Run the SetupNearestNode notebook to setup the data for the analysis
-2. Run the Coverage notebook to get the initial coverage of the city
-3. Run the Communities notebook to identify the positions of the new POIs
-4. Run the CoverageBetweenness and CoverageCloseness to repeat the analysis and get the results
+1. (optional) Run the 01_SetupNearestNode notebook to setup the data for the analysis
+2. Run the 02_Coverage notebook to get the initial coverage of the city
+3. Run the 03_Communities notebook to identify the positions of the new POIs
+4. Run the 04a_CoverageCloseness and 04b_CoverageBetweenness to repeat the analysis and get the final results
 
 ## Results
 The initial coverage of all categories is 35%. The coverage after applying the code is the following: 
 
-* With Betweenness centrality, **increases to 66,62%**
-* With Closeness centrality, **increases to 64,63%**
+* With Betweenness centrality, **increases to approximately 67%**
+* With Closeness centrality, **increases to approximately 64%**
 
 Full results can be seen in the project report.
 
