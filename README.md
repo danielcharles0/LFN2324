@@ -66,7 +66,7 @@ git clone https://github.com/danielcharles0/LFN2324.git
 pip install -r requirements.txt
 ```
 
-3. Run the notebooks using Jupyter in the following order
+3. Follow the instructions on the [usage section](#usage)
 
 ## Usage
 
@@ -75,6 +75,9 @@ pip install -r requirements.txt
 3. Run the 03_Communities notebook to identify the positions of the new POIs
 4. Run the 04a_CoverageCloseness and 04b_CoverageBetweenness to repeat the analysis and get the final results
 
+> [!NOTE]  
+> Coverage notebooks may take approximately 5 minutes to complete
+
 ## Results
 The initial coverage of all categories is 35%. The coverage after applying the code is the following: 
 
@@ -82,6 +85,9 @@ The initial coverage of all categories is 35%. The coverage after applying the c
 * With Closeness centrality, **increases to approximately 64%**
 
 Full results can be seen in the project report.
+
+> [!NOTE]  
+> Results may vary slightly due to the random shuffle in the Louvain algorithm, consult the [NetworkX documentation](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html#networkx.algorithms.community.louvain.louvain_communities) for more informations
 
 ## Authors
 
