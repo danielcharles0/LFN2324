@@ -84,7 +84,7 @@ The initial coverage of all categories is 35%. The coverage after applying the c
 * With Betweenness centrality, **increases to approximately 67%**
 * With Closeness centrality, **increases to approximately 64%**
 
-Full results can be seen in the project report.
+Full results can be seen in the [project report](LFN2324_Final.pdf).
 
 > [!NOTE]  
 > Results may vary slightly due to the random shuffle in the Louvain algorithm, consult the [NetworkX documentation](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.community.louvain.louvain_communities.html#networkx.algorithms.community.louvain.louvain_communities) for more informations
